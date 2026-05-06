@@ -1,28 +1,47 @@
 import { useContext } from "react";
 
-import { Link } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
 
 import { CartContext } from "../context/CartContext";
 
 function Navbar() {
   const context = useContext(CartContext);
 
+  const location = useLocation();
+
   if (!context) return null;
 
+  const search =
+    location.pathname === "/cart"
+      ? localStorage.getItem("homeSearch") || ""
+      : location.search.replace("?", "");
+
+  const homeLink = search
+    ? `/?${search}`
+    : "/";
+
   return (
-    <div className="navbar">
-      <Link to="/" className="logo">
-        Shop
+    <nav className="navbar">
+      <Link
+        to={homeLink}
+        className="logo"
+      >
+       E-Commerce
       </Link>
 
       <div className="nav-links">
-        <Link to="/">Home</Link>
+        <Link to={homeLink}>
+          Home
+        </Link>
 
         <Link to="/cart">
           Cart ({context.cart.length})
         </Link>
       </div>
-    </div>
+    </nav>
   );
 }
 

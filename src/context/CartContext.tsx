@@ -2,37 +2,50 @@ import {
   createContext,
   useEffect,
   useState,
-  type ReactNode,
 } from "react";
-import type { Product } from "../types/product";
 
+import type { Product } from "../types/product";
 
 type CartContextType = {
   cart: Product[];
-  setCart: React.Dispatch<React.SetStateAction<Product[]>>;
+  setCart: React.Dispatch<
+    React.SetStateAction<Product[]>
+  >;
 };
 
 export const CartContext =
-  createContext<CartContextType | null>(null);
+  createContext<CartContextType | null>(
+    null,
+  );
 
 type Props = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
-export function CartProvider({ children }: Props) {
-  const [cart, setCart] = useState<Product[]>(() => {
-    const data = localStorage.getItem("cart");
+function CartProvider({ children }: Props) {
+  const [cart, setCart] = useState<Product[]>(
+    () => {
+      const data =
+        localStorage.getItem("cart");
 
-    return data ? JSON.parse(data) : [];
-  });
+      return data ? JSON.parse(data) : [];
+    },
+  );
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart),
+    );
   }, [cart]);
 
   return (
-    <CartContext.Provider value={{ cart, setCart }}>
+    <CartContext.Provider
+      value={{ cart, setCart }}
+    >
       {children}
     </CartContext.Provider>
   );
 }
+
+export default CartProvider;

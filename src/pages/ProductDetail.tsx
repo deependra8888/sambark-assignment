@@ -9,8 +9,8 @@ import {
   useParams,
 } from "react-router-dom";
 
-
 import { CartContext } from "../context/CartContext";
+
 import type { Product } from "../types/product";
 
 function ProductDetail() {
@@ -20,6 +20,9 @@ function ProductDetail() {
   const { id } = useParams();
 
   const context = useContext(CartContext);
+
+  const savedSearch =
+    localStorage.getItem("homeSearch");
 
   useEffect(() => {
     fetch(
@@ -37,7 +40,14 @@ function ProductDetail() {
 
   return (
     <div className="container">
-      <Link to="/" className="back-link">
+      <Link
+        to={`/${
+          savedSearch
+            ? `?${savedSearch}`
+            : ""
+        }`}
+        className="back-link"
+      >
         ← Back To Home
       </Link>
 
@@ -45,6 +55,10 @@ function ProductDetail() {
         <img
           src={product.images?.[0]}
           alt={product.title}
+          onError={(e) => {
+            e.currentTarget.src =
+              "https://placehold.co/600x400?text=No+Image";
+          }}
         />
 
         <div className="detail-content">

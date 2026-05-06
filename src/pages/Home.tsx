@@ -1,33 +1,69 @@
-import { useEffect, useState } from "react";
-
 import {
-  useSearchParams,
-} from "react-router-dom";
+  useEffect,
+  useState,
+} from "react";
+
+import { useSearchParams } from "react-router-dom";
 
 import ProductCard from "../components/ProductCard";
-import type { Product } from "../types/product";
 
+import type {
+  Category,
+  Product,
+} from "../types/product";
+
+const ALLOWED_CATEGORIES = [
+  "Clothes",
+  "Electronics",
+  "Furniture",
+  "Shoes",
+  "Miscellaneous",
+];
 
 function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] =
+    useState<Product[]>([]);
 
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] =
+    useState<Category[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
   const [searchParams, setSearchParams] =
     useSearchParams();
 
   const selectedCategories =
-    searchParams.get("categories")?.split(",") || [];
+    searchParams
+      .get("categories")
+      ?.split(",") || [];
 
-  const sort = searchParams.get("sort") || "";
+  const sort =
+    searchParams.get("sort") || "";
 
   useEffect(() => {
-    fetch("https://api.escuelajs.co/api/v1/categories")
+    localStorage.setItem(
+      "homeSearch",
+      searchParams.toString(),
+    );
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetch(
+      "https://api.escuelajs.co/api/v1/categories",
+    )
       .then((res) => res.json())
       .then((data) => {
-        setCategories(data.slice(0, 5));
+        const filtered = data.filter(
+          (item: Category) =>
+            ALLOWED_CATEGORIES.some(
+              (category) =>
+                category.toLowerCase() ===
+                item.name.toLowerCase(),
+            ),
+        );
+
+        setCategories(filtered);
       });
   }, []);
 
@@ -38,43 +74,65 @@ function Home() {
 
         let allProducts: Product[] = [];
 
-        if (selectedCategories.length === 0) {
+        if (
+          selectedCategories.length === 0
+        ) {
           const res = await fetch(
-            "https://api.escuelajs.co/api/v1/products",
+            "https://api.escuelajs.co/api/v1/products?offset=0&limit=20",
           );
 
-          allProducts = await res.json();
+          allProducts =
+            await res.json();
         } else {
-          const promises = selectedCategories.map(
-            async (id) => {
-              const res = await fetch(
-                `https://api.escuelajs.co/api/v1/products/?categoryId=${id}`,
-              );
+          const promises =
+            selectedCategories.map(
+              async (id) => {
+                const res =
+                  await fetch(
+                    `https://api.escuelajs.co/api/v1/products/?categoryId=${id}`,
+                  );
 
-              return res.json();
-            },
-          );
+                return res.json();
+              },
+            );
 
-          const results = await Promise.all(promises);
+          const results =
+            await Promise.all(
+              promises,
+            );
 
           allProducts = results.flat();
 
-          allProducts = allProducts.filter(
-            (item, index, self) =>
-              index ===
-              self.findIndex((p) => p.id === item.id),
-          );
+          allProducts =
+            allProducts.filter(
+              (
+                item,
+                index,
+                self,
+              ) =>
+                index ===
+                self.findIndex(
+                  (p) =>
+                    p.id === item.id,
+                ),
+            );
         }
 
         if (sort === "low") {
-          allProducts.sort(
-            (a, b) => a.price - b.price,
+          allProducts = [
+            ...allProducts,
+          ].sort(
+            (a, b) =>
+              a.price - b.price,
           );
         }
 
         if (sort === "high") {
-          allProducts.sort(
-            (a, b) => b.price - a.price,
+          allProducts = [
+            ...allProducts,
+          ].sort(
+            (a, b) =>
+              b.price - a.price,
           );
         }
 
@@ -87,10 +145,17 @@ function Home() {
     }
 
     fetchProducts();
-  }, [selectedCategories.join(","), sort]);
+  }, [
+    selectedCategories.join(","),
+    sort,
+  ]);
 
-  function handleCategory(id: string) {
-    let updated = [...selectedCategories];
+  function handleCategory(
+    id: string,
+  ) {
+    let updated = [
+      ...selectedCategories,
+    ];
 
     if (updated.includes(id)) {
       updated = updated.filter(
@@ -100,24 +165,50 @@ function Home() {
       updated.push(id);
     }
 
-    setSearchParams({
-      categories: updated.join(","),
-      sort,
-    });
+    const params: Record<
+      string,
+      string
+    > = {};
+
+    if (updated.length) {
+      params.categories =
+        updated.join(",");
+    }
+
+    if (sort) {
+      params.sort = sort;
+    }
+
+    setSearchParams(params);
   }
 
   function handleSort(value: string) {
-    setSearchParams({
-      categories: selectedCategories.join(","),
-      sort: value,
-    });
+    const params: Record<
+      string,
+      string
+    > = {};
+
+    if (
+      selectedCategories.length
+    ) {
+      params.categories =
+        selectedCategories.join(",");
+    }
+
+    if (value) {
+      params.sort = value;
+    }
+
+    setSearchParams(params);
   }
 
   return (
-    <div className="container">
-      <h1 className="page-title">Products</h1>
+    <main className="container">
+      <h1 className="page-title">
+        Products
+      </h1>
 
-      <div className="filters">
+      <section className="filters">
         <div>
           <h3>Categories</h3>
 
@@ -133,7 +224,9 @@ function Home() {
                     String(item.id),
                   )}
                   onChange={() =>
-                    handleCategory(String(item.id))
+                    handleCategory(
+                      String(item.id),
+                    )
                   }
                 />
 
@@ -149,10 +242,14 @@ function Home() {
           <select
             value={sort}
             onChange={(e) =>
-              handleSort(e.target.value)
+              handleSort(
+                e.target.value,
+              )
             }
           >
-            <option value="">Select</option>
+            <option value="">
+              Select
+            </option>
 
             <option value="low">
               Price Low To High
@@ -163,23 +260,23 @@ function Home() {
             </option>
           </select>
         </div>
-      </div>
+      </section>
 
       {loading ? (
         <h2>Loading...</h2>
       ) : products.length === 0 ? (
         <h2>No Products Found</h2>
       ) : (
-        <div className="grid">
+        <section className="grid">
           {products.map((item) => (
             <ProductCard
               key={item.id}
               product={item}
             />
           ))}
-        </div>
+        </section>
       )}
-    </div>
+    </main>
   );
 }
 
