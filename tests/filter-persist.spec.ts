@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("category filter works", async ({ page }) => {
+test("filters persist after refresh", async ({ page }) => {
   await page.goto("/");
 
   const checkbox = page
@@ -9,5 +9,7 @@ test("category filter works", async ({ page }) => {
 
   await checkbox.click();
 
-  await expect(page.locator(".card").first()).toBeVisible();
+  await page.reload();
+
+  await expect(checkbox).toBeChecked();
 });

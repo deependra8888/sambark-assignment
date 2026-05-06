@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test("home page loads products", async ({ page }) => {
+test("sorting works", async ({ page }) => {
   await page.goto("/");
+
+  await page.selectOption("select", "low");
 
   await expect(page.locator(".card").first()).toBeVisible();
 });
