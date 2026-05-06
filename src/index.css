@@ -1,4 +1,3 @@
-
 * {
   margin: 0;
   padding: 0;
@@ -15,8 +14,6 @@ a {
   text-decoration: none;
   color: inherit;
 }
-
-
 
 .navbar {
   height: 70px;
@@ -47,8 +44,6 @@ a {
   font-weight: 600;
 }
 
-
-
 .container {
   max-width: 1400px;
   margin: auto;
@@ -59,8 +54,6 @@ a {
   margin-bottom: 24px;
   font-size: 32px;
 }
-
-
 
 .filters {
   background: white;
@@ -112,15 +105,11 @@ select {
   cursor: pointer;
 }
 
-
-
 .grid {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
 }
-
-
 
 .card {
   flex: 1 1 260px;
@@ -169,7 +158,6 @@ select {
   font-size: 20px;
   font-weight: bold;
 }
-
 
 .back-link {
   display: inline-block;
@@ -244,8 +232,6 @@ button:hover {
   opacity: 0.9;
 }
 
-
-
 .cart-info {
   margin-bottom: 24px;
 
@@ -253,14 +239,10 @@ button:hover {
   gap: 30px;
 }
 
-
-
 .loading {
   font-size: 22px;
   font-weight: bold;
 }
-
-
 
 @media (max-width: 900px) {
   .detail {
